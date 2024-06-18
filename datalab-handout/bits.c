@@ -224,12 +224,10 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  int y = x << 24;
-  int z = y << 28;
-  int mask = 0x30;
-  mask = mask << 24;
-  int result = !((x + ~mask + 1) >> 31) & !((z + 9) >> 31);
-  return result;
+  int lowerBound = x + ~0x30 + 1;
+  int upperBound = 0x39 + ~x + 1;
+
+  return !(lowerBound >> 31 | upperBound >> 31);
 }
 /* 
  * conditional - same as x ? y : z 
@@ -239,7 +237,9 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  int mask = !!x;
+  mask = ~mask + 1;
+  return (mask & y) | (~mask & z);
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -249,7 +249,17 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  int mask = x + ~y +1;// x - y, if x <= y, then mask will be negative
+  int sign = mask >> 31 & 1;// get the sign of the mask, 1 means negative, 0 means positive
+
+  int x_sign = (x >> 31) & 1;
+  int y_sign = (x >> 31) & 1;
+
+  int sign_diff = x_sign ^ y_sign;// 1 if signs are different, - if they are same.
+  //If signs are different, use the sign of x to determine the result
+  //If signs are same, use the sign of the result.
+
+  return (sign_diff & x_sign) | (!sign_diff & sign);
 }
 //4
 /* 
