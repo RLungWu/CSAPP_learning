@@ -13,6 +13,7 @@
  * case it's OK.  
  */
 
+#include <stdio.h>
 #if 0
 /*
  * Instructions to Students:
@@ -191,12 +192,12 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  int y = x >> 1;
-  int z = x + y;
-  int max = ~(1 << 31);
-  int result = !(z ^ max);
+  int mask = 0xAA;
+  mask = (mask << 8) | mask;
+  mask = (mask << 16) | mask;
 
-  return result;
+  return !((x & mask) ^ mask);
+
 }
 /* 
  * negate - return -x 
@@ -206,7 +207,11 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  int min = ~0;
+  int y = ~x;
+  int result = min + y +2;
+  
+  return result;
 }
 //3
 /* 
@@ -219,7 +224,12 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+  int y = x << 24;
+  int z = y << 28;
+  int mask = 0x30;
+  mask = mask << 24;
+  int result = !((x + ~mask + 1) >> 31) & !((z + 9) >> 31);
+  return result;
 }
 /* 
  * conditional - same as x ? y : z 
