@@ -248,19 +248,43 @@ int conditional(int x, int y, int z) {
  *   Max ops: 24
  *   Rating: 3
  */
-int isLessOrEqual(int x, int y) {
-  int mask = x + ~y +1;// x - y, if x <= y, then mask will be negative
-  int sign = mask >> 31 & 1;// get the sign of the mask, 1 means negative, 0 means positive
+/*
+ * Original version - Can't fix the bug
+ int isLessOrEqual(int x, int y) {
+printf("x: %d, y: %d\n", x, y);
 
-  int x_sign = (x >> 31) & 1;
-  int y_sign = (x >> 31) & 1;
+int same = !(x ^ y);
+printf("same: %d\n", same);
 
-  int sign_diff = x_sign ^ y_sign;// 1 if signs are different, - if they are same.
-  //If signs are different, use the sign of x to determine the result
-  //If signs are same, use the sign of the result.
+int div_x_y = x + ~y + 1; // x - y
+printf("div_x_y: %d\n", div_x_y);
+int sign_div_x_y = div_x_y >> 31 & 1; // sign of x - y, 1 means negative
+printf("sign_div_x_y: %d\n", sign_div_x_y);
 
-  return (sign_diff & x_sign) | (!sign_diff & sign);
+int div_y_x = y + ~x + 1; // y - x
+printf("div_y_x: %d\n", div_y_x);
+int sign_div_y_x = (div_y_x >> 31 & 1); // sign of y - x, 1 means negative
+printf("sign_div_y_x: %d\n", sign_div_y_x);
+
+printf("result: %d\n", same | sign_div_x_y | sign_div_y_x);
+
+return same | (sign_div_x_y | sign_div_y_x);
 }
+ */
+int isLessOrEqual(int x, int y) {
+  //Got this answer from Google
+  int y_sign = (y >> 31) & 1;
+  int x_sign = (x >> 31) & 1;
+
+  //check if x and ya re the same, whether one is negative or not, and check if x is less than y
+  int z = (!(x_sign ^ y_sign)) & ((x + ~y) >> 31);
+
+  return z | ((!y_sign) & x_sign);
+}
+
+
+
+
 //4
 /* 
  * logicalNeg - implement the ! operator, using all of 
@@ -271,7 +295,11 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+  /*
+   * Compare x and -x, if x is 0, then x and -x will be 0.
+   */
+  int result = ((x | (~x + 1)) >> 31) + 1;
+  return result;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
@@ -286,7 +314,35 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  int flag;
+  int bit_16, bit_8, bit_4, bit_2, bit_1;
+  int sign = x >> 31;
+  //printf("sign: %d\n", sign);
+  x = (sign & ~x) | (~sign & x);
+  //printf("x: %d\n", x);
+
+  flag = !!(x >> 16);
+  bit_16 = flag << 4;
+  x = x >> bit_16;
+
+  flag = !!(x >> 8);
+  bit_8 = flag << 3;
+  x = x >> bit_8;
+
+  flag = !!(x >> 4);
+  bit_4 = flag << 2;
+  x = x >> bit_4;
+
+  flag = !!(x >> 2);
+  bit_2 = flag << 1;
+  x = x >> bit_2;
+
+  flag = !!(x >> 1);
+  bit_1 = flag;
+  x = x >> bit_1;
+
+
+  return bit_16 + bit_8 + bit_4 + bit_2 + bit_1 + x + 1;
 }
 //float
 /* 
@@ -301,7 +357,36 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+  unsigned int s, esp, frac;
+  s = uf & 0x80000000;
+  
+  esp = uf & 0x7F800000;
+  esp = esp >> 23;
+
+  frac = uf & 0x007FFFFF;
+
+  unsigned ret = 0;
+  unsigned inf = s | (0xff << 23);
+
+  if (esp == 0xff) return uf;
+
+  if (esp == 0){
+    if(frac == 0) return uf;
+
+    frac = frac << 1;
+    ret = s | (esp << 23) | frac;
+    return ret;
+  }
+
+  esp++;
+
+  if(esp == 0xff) return inf;
+
+  ret = s | (esp << 23) | frac;
+
+  return ret;
+
+
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
