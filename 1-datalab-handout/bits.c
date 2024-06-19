@@ -401,7 +401,41 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+  unsigned int s, esp, frac;
+  s = uf >> 31;
+
+  
+  esp = uf & 0x7F800000;
+  esp = esp >> 23;
+
+  frac = uf & 0x007FFFFF;
+
+  int result = 0;
+
+  int E = esp - 127;
+
+  //printf("frac: %d\n", frac);
+  frac = frac | 0x00800000;
+  //printf("frac: %d\n", frac);
+  /*
+  Places a '1' at the 24th position from the right, which corresponds to the implicit '1' 
+  that is always present in the mantissa of a normalized floating-point number but isn't included in the 23 bits stored in the frac.
+   */
+
+  if (E < 0) return 0;
+  if (E > 31) return 0x80000000u;
+
+  if (E > 23){
+    result = frac << (E - 23);
+  } else {
+    result = frac >> (23 - E);
+  }
+
+  if(s == 1){
+    return (~result) + 1;
+  }else{
+    return result;
+  }
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -417,5 +451,14 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+  int exp;
+  unsigned ret;
+
+  if(x < -149) return 0;//too small
+  if(x > 127) return 0xff << 23;//too large
+
+  if (x < -126) return 0x1 << (149 + x);
+  exp = x + 127;
+  ret = exp << 23;
+  return ret;
 }
