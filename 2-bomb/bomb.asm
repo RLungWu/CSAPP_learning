@@ -485,9 +485,10 @@ Disassembly of section .text:
   401073:	48 89 44 24 18       	mov    %rax,0x18(%rsp)        # 0x18(%rsp) = rax = fs:0x28
   401078:	31 c0                	xor    %eax,%eax              # eax = 0
   40107a:	e8 9c 02 00 00       	callq  40131b <string_length> # call string_length
-  40107f:	83 f8 06             	cmp    $0x6,%eax              # compare the return value with 6
+  40107f:	83 f8 06             	cmp    $0x6,%eax              # compare the return value with 6 => The answer is 6 chars
   401082:	74 4e                	je     4010d2 <phase_5+0x70>  # if the return value is 6, jump to 4010d2, since next one is explore, we need to make sure eax be 6
   401084:	e8 b1 03 00 00       	callq  40143a <explode_bomb>
+
   401089:	eb 47                	jmp    4010d2 <phase_5+0x70>
   40108b:	0f b6 0c 03          	movzbl (%rbx,%rax,1),%ecx     # ecx = *(rbx + rax) = rbx[rax]
   40108f:	88 0c 24             	mov    %cl,(%rsp)         
@@ -525,26 +526,33 @@ Disassembly of section .text:
   4010fa:	55                   	push   %rbp
   4010fb:	53                   	push   %rbx
   4010fc:	48 83 ec 50          	sub    $0x50,%rsp
+
   401100:	49 89 e5             	mov    %rsp,%r13
   401103:	48 89 e6             	mov    %rsp,%rsi
-  401106:	e8 51 03 00 00       	callq  40145c <read_six_numbers>
+  401106:	e8 51 03 00 00       	callq  40145c <read_six_numbers> # The answer is 6 numbers
+
   40110b:	49 89 e6             	mov    %rsp,%r14
   40110e:	41 bc 00 00 00 00    	mov    $0x0,%r12d
   401114:	4c 89 ed             	mov    %r13,%rbp
   401117:	41 8b 45 00          	mov    0x0(%r13),%eax
-  40111b:	83 e8 01             	sub    $0x1,%eax
+
+  40111b:	83 e8 01             	sub    $0x1,%eax                # Ensure read 6 numbers.
   40111e:	83 f8 05             	cmp    $0x5,%eax
   401121:	76 05                	jbe    401128 <phase_6+0x34>
   401123:	e8 12 03 00 00       	callq  40143a <explode_bomb>
+
   401128:	41 83 c4 01          	add    $0x1,%r12d
   40112c:	41 83 fc 06          	cmp    $0x6,%r12d
   401130:	74 21                	je     401153 <phase_6+0x5f>
+
   401132:	44 89 e3             	mov    %r12d,%ebx
   401135:	48 63 c3             	movslq %ebx,%rax
   401138:	8b 04 84             	mov    (%rsp,%rax,4),%eax
+  
   40113b:	39 45 00             	cmp    %eax,0x0(%rbp)
   40113e:	75 05                	jne    401145 <phase_6+0x51>
   401140:	e8 f5 02 00 00       	callq  40143a <explode_bomb>
+
   401145:	83 c3 01             	add    $0x1,%ebx
   401148:	83 fb 05             	cmp    $0x5,%ebx
   40114b:	7e e8                	jle    401135 <phase_6+0x41>
@@ -596,9 +604,11 @@ Disassembly of section .text:
   4011e5:	39 03                	cmp    %eax,(%rbx)
   4011e7:	7d 05                	jge    4011ee <phase_6+0xfa>
   4011e9:	e8 4c 02 00 00       	callq  40143a <explode_bomb>
+  
   4011ee:	48 8b 5b 08          	mov    0x8(%rbx),%rbx
   4011f2:	83 ed 01             	sub    $0x1,%ebp
   4011f5:	75 e8                	jne    4011df <phase_6+0xeb>
+
   4011f7:	48 83 c4 50          	add    $0x50,%rsp
   4011fb:	5b                   	pop    %rbx
   4011fc:	5d                   	pop    %rbp
