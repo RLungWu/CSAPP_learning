@@ -421,18 +421,18 @@ Disassembly of section .text:
   400fcd:	c3                   	retq   
 
 0000000000400fce <func4>:
-  400fce:	48 83 ec 08          	sub    $0x8,%rsp              # allocate 8 bytes on the stack
-  400fd2:	89 d0                	mov    %edx,%eax              # move the third parameter to eax  eax = edx
-  400fd4:	29 f0                	sub    %esi,%eax              # eax = eax - esi
-  400fd6:	89 c1                	mov    %eax,%ecx              # ecx = eax
-  400fd8:	c1 e9 1f             	shr    $0x1f,%ecx             # ecs = ecx >> 31
-  400fdb:	01 c8                	add    %ecx,%eax              # ecx = ecx + eax
-  400fdd:	d1 f8                	sar    %eax                   # eax = eax >> 1
-  400fdf:	8d 0c 30             	lea    (%rax,%rsi,1),%ecx     # ecx = rax + rsi
-  400fe2:	39 f9                	cmp    %edi,%ecx              
-  400fe4:	7e 0c                	jle    400ff2 <func4+0x24>    # jump if edi <= ecx
-  400fe6:	8d 51 ff             	lea    -0x1(%rcx),%edx        # edx = ecx - 1
-  400fe9:	e8 e0 ff ff ff       	callq  400fce <func4>         # call func4
+  400fce:	48 83 ec 08          	sub    $0x8,%rsp              # edi=a, esi=0, edx=14
+  400fd2:	89 d0                	mov    %edx,%eax              # edi=a, esi=0, edx=14, eax=14
+  400fd4:	29 f0                	sub    %esi,%eax              # edi=a, esi=0, edx=14, eax=14
+  400fd6:	89 c1                	mov    %eax,%ecx              # edi=a, esi=0, edx=14, eax=14, ecx = 14
+  400fd8:	c1 e9 1f             	shr    $0x1f,%ecx             # edi=a, esi=0, edx=14, eax=14, ecx = 0
+  400fdb:	01 c8                	add    %ecx,%eax              # edi=a, esi=0, edx=14, eax=14, ecx = 0
+  400fdd:	d1 f8                	sar    %eax                   # edi=a, esi=0, edx=14, eax=7, ecx = 0
+  400fdf:	8d 0c 30             	lea    (%rax,%rsi,1),%ecx     # edi=a, esi=0, edx=14, eax=7, ecx = 7
+  400fe2:	39 f9                	cmp    %edi,%ecx              # 
+  400fe4:	7e 0c                	jle    400ff2 <func4+0x24>    # ecx <= edi, jump to 400ff2
+  400fe6:	8d 51 ff             	lea    -0x1(%rcx),%edx       #
+  400fe9:	e8 e0 ff ff ff       	callq  400fce <func4>         # 
   400fee:	01 c0                	add    %eax,%eax
   400ff0:	eb 15                	jmp    401007 <func4+0x39>
   400ff2:	b8 00 00 00 00       	mov    $0x0,%eax
@@ -445,14 +445,7 @@ Disassembly of section .text:
   40100b:	c3                   	retq   
 
   /*
-   * int func(int edi, int esi(0), int edx(14)) {
-   *    int eax = edx;  //eax = 14
-   *    eax -= esi;     // eax = eax - esi = 14
-   *   int ecx = eax;   // ecx = eax = 14
-   *  ecx >>= 31;       // ecx = ecx >> 31 = 0
-   *  eax += ecx;       // eax = eax + ecx = 14
-   *  eax >>= 1;        // eax = eax >> 1 = 7
-   *  ecx = eax + esi;  // ecx = eax + esi = 7 + 0 = 7
+   * 
    */
 
 
@@ -473,31 +466,31 @@ Disassembly of section .text:
   40103a:	ba 0e 00 00 00       	mov    $0xe,%edx                        # move 14 to edx
   40103f:	be 00 00 00 00       	mov    $0x0,%esi
   401044:	8b 7c 24 08          	mov    0x8(%rsp),%edi                   # move the first number to edi
-  401048:	e8 81 ff ff ff       	callq  400fce <func4>
+  401048:	e8 81 ff ff ff       	callq  400fce <func4>                   # call func4(edi, 0, 14)
 
   40104d:	85 c0                	test   %eax,%eax
-  40104f:	75 07                	jne    401058 <phase_4+0x4c>            # If eax != 0, jump to 401058
-  401051:	83 7c 24 0c 00       	cmpl   $0x0,0xc(%rsp)
+  40104f:	75 07                	jne    401058 <phase_4+0x4c>            # If eax != 0, jump to 401058, so eax must be 0
+  401051:	83 7c 24 0c 00       	cmpl   $0x0,0xc(%rsp)                   # compare 0xc(%rsp) with 0
   401056:	74 05                	je     40105d <phase_4+0x51>            # If 0xc(%rsp) == 0, jump to 40105d
   401058:	e8 dd 03 00 00       	callq  40143a <explode_bomb>
   40105d:	48 83 c4 18          	add    $0x18,%rsp
   401061:	c3                   	retq   
 
 0000000000401062 <phase_5>:
-  401062:	53                   	push   %rbx
-  401063:	48 83 ec 20          	sub    $0x20,%rsp
-  401067:	48 89 fb             	mov    %rdi,%rbx
-  40106a:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax
+  401062:	53                   	push   %rbx                   # 
+  401063:	48 83 ec 20          	sub    $0x20,%rsp             # 
+  401067:	48 89 fb             	mov    %rdi,%rbx              #  rbx = rdi//rdi is the first parameter
+  40106a:	64 48 8b 04 25 28 00 	mov    %fs:0x28,%rax          #  rax = fs:0x28 = 0xf30bab97e1082600(not sure)
   401071:	00 00 
-  401073:	48 89 44 24 18       	mov    %rax,0x18(%rsp)
-  401078:	31 c0                	xor    %eax,%eax
-  40107a:	e8 9c 02 00 00       	callq  40131b <string_length>
-  40107f:	83 f8 06             	cmp    $0x6,%eax
-  401082:	74 4e                	je     4010d2 <phase_5+0x70>
+  401073:	48 89 44 24 18       	mov    %rax,0x18(%rsp)        # 0x18(%rsp) = rax = fs:0x28
+  401078:	31 c0                	xor    %eax,%eax              # eax = 0
+  40107a:	e8 9c 02 00 00       	callq  40131b <string_length> # call string_length
+  40107f:	83 f8 06             	cmp    $0x6,%eax              # compare the return value with 6
+  401082:	74 4e                	je     4010d2 <phase_5+0x70>  # if the return value is 6, jump to 4010d2, since next one is explore, we need to make sure eax be 6
   401084:	e8 b1 03 00 00       	callq  40143a <explode_bomb>
   401089:	eb 47                	jmp    4010d2 <phase_5+0x70>
-  40108b:	0f b6 0c 03          	movzbl (%rbx,%rax,1),%ecx
-  40108f:	88 0c 24             	mov    %cl,(%rsp)
+  40108b:	0f b6 0c 03          	movzbl (%rbx,%rax,1),%ecx     # ecx = *(rbx + rax) = rbx[rax]
+  40108f:	88 0c 24             	mov    %cl,(%rsp)         
   401092:	48 8b 14 24          	mov    (%rsp),%rdx
   401096:	83 e2 0f             	and    $0xf,%edx
   401099:	0f b6 92 b0 24 40 00 	movzbl 0x4024b0(%rdx),%edx
@@ -514,8 +507,8 @@ Disassembly of section .text:
   4010c6:	e8 6f 03 00 00       	callq  40143a <explode_bomb>
   4010cb:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
   4010d0:	eb 07                	jmp    4010d9 <phase_5+0x77>
-  4010d2:	b8 00 00 00 00       	mov    $0x0,%eax
-  4010d7:	eb b2                	jmp    40108b <phase_5+0x29>
+  4010d2:	b8 00 00 00 00       	mov    $0x0,%eax                # eax = 0
+  4010d7:	eb b2                	jmp    40108b <phase_5+0x29>      # jump to 40108b
   4010d9:	48 8b 44 24 18       	mov    0x18(%rsp),%rax
   4010de:	64 48 33 04 25 28 00 	xor    %fs:0x28,%rax
   4010e5:	00 00 

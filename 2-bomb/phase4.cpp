@@ -1,21 +1,16 @@
 #include <iostream>
 using namespace std;
 
-int func_4(int edi, int esi, int edx){
-    int eax_return = edx;
-    eax_return = eax_return - esi;
-    int ecx = eax_return;
-    ecx = ecx >> 31;
-    ecx = ecx + eax_return;
-    eax_return = eax_return >> 1;
-    ecx = eax_return + ecx;
+int func(int a, int b, int n) {
+    int result = n - b;  // Corresponds to sub %esi,%eax when esi=0 initially
+    result >>= 1;        // Corresponds to sar %eax
 
-//    if (edi <= ecx){
-
-//    }else{
-        
-//    }
-    cout <<"edi:"<< edi << "ecx" << ecx << "eax" << eax_return << "esi" << esi << "edx" << edx;
+    if (a <= result) {
+        return 0;
+    } else if (a > result) {
+        return 2 * func(a, result + 1, n); // Recursively calls itself with adjusted parameters
+    }
+    return result;
 }
 
 int main(){
