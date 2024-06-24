@@ -3,4 +3,5 @@
 |Lab|Done?|
 |---|---|
 |1|v|
-|2|Progressing|
+|2|v|
+|3|Progressing|
