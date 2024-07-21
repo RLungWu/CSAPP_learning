@@ -1,2 +1,0 @@
-pushq $0x4018fa
-mov  
